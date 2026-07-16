@@ -74,7 +74,7 @@ Aprendizajes útiles para este proyecto:
 | v1.6 | 2026-07-16 | `acef41f` | Se agrega versión con diseño del QR (`qr-soporte-styled.png`/`.svg`): color azul institucional aproximado, puntos redondeados y logo institucional al centro; verificado que sigue siendo decodificable. |
 | v1.7 | 2026-07-16 | `033095c` | Se confirma por el usuario que el QR con diseño escanea correctamente desde celular; se actualiza el registro de pruebas. |
 | v1.8 | 2026-07-16 | `2e873d5` | Se agrega sección de referencia con el análisis de `mesacarlos/QRServer-API`, comparándolo contra la arquitectura actual y documentando aprendizajes para posibles fases futuras. |
-| v1.9 | 2026-07-16 | *(pendiente)* | Se agrega `tools/generar-qr.html`: generador de QR con diseño 100% en el navegador (sin Node), usando `qr-code-styling` y `jsQR` vendorizados; verificado con Playwright/Chromium real. |
+| v1.9 | 2026-07-16 | `69e9967` | Se agrega `tools/generar-qr.html`: generador de QR con diseño 100% en el navegador (sin Node), usando `qr-code-styling` y `jsQR` vendorizados; verificado con Playwright/Chromium real. |
 
 ## Registro de pruebas
 
