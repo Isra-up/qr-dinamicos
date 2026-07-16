@@ -42,6 +42,7 @@ Editar la fuente de datos del Apps Script (hoja de cálculo) que resuelve `k -> 
 | v1.4 | 2026-07-16 | `9c2201f` | Copia pública del repo (`qr-dinamicos`) publicada con GitHub Pages activado; nuevo Apps Script desplegado con acceso público y `AS_URL_BASE` actualizado para apuntar a él. |
 | v1.5 | 2026-07-16 | `043ffd1` | Se agrega `assets/qr-soporte.png`, código QR generado para `https://isra-up.github.io/qr-dinamicos/?k=soporte`. |
 | v1.6 | 2026-07-16 | `acef41f` | Se agrega versión con diseño del QR (`qr-soporte-styled.png`/`.svg`): color azul institucional aproximado, puntos redondeados y logo institucional al centro; verificado que sigue siendo decodificable. |
+| v1.7 | 2026-07-16 | `033095c` | Se confirma por el usuario que el QR con diseño escanea correctamente desde celular; se actualiza el registro de pruebas. |
 
 ## Registro de pruebas
 
