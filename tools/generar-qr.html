@@ -186,8 +186,11 @@
 
       qrCode.append(preview);
 
-      // Esperar a que el canvas termine de dibujarse (incluye carga del logo).
-      await new Promise((resolve) => setTimeout(resolve, 300));
+      // getRawData espera internamente a que termine el dibujo (incluida la
+      // carga del logo, que puede tardar según la red) antes de resolver;
+      // el <canvas> que ya está en el DOM es el mismo que usa internamente,
+      // así que al resolver esta promesa su contenido queda listo para leer.
+      await qrCode.getRawData("png");
 
       const canvas = preview.querySelector("canvas");
       if (!canvas) {
