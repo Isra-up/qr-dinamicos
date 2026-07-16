@@ -2,9 +2,11 @@
 
 Sistema de código QR dinámico para soporte, alojado en GitHub Pages.
 
+Publicado en: https://isra-up.github.io/qr-dinamicos/ (copia pública del repositorio, en `github.com/Isra-up/qr-dinamicos`, para que GitHub Pages gratuito funcione).
+
 ## Funcionamiento
 
-1. El código QR apunta siempre a la misma URL de GitHub Pages, con un parámetro `k` que identifica el destino (por ejemplo `https://usuario.github.io/DynQRs/?k=soporte`).
+1. El código QR apunta siempre a la misma URL de GitHub Pages, con un parámetro `k` que identifica el destino (por ejemplo `https://isra-up.github.io/qr-dinamicos/?k=soporte`).
 2. `index.html` toma ese `k` y consulta un Google Apps Script (`AS_URL_BASE`), que devuelve la URL de destino actual.
 3. Si la URL devuelta es válida y usa un protocolo permitido (`http`, `https`, `mailto`, `tel`), el navegador redirige automáticamente.
 4. Si no hay `k`, el servicio no responde, o la URL devuelta no es válida, se muestra un mensaje y un botón para reintentar en lugar de fallar en silencio.
@@ -29,3 +31,16 @@ Editar la fuente de datos del Apps Script (hoja de cálculo) que resuelve `k -> 
 | v1.1 | 2022-01-19 | `fe37ff8` | Se agrega integración con Google Apps Script (`AS_URL_BASE`) y parámetro `k`. |
 | v1.2 | 2025-01-18 | `fd30afe` | Actualización del endpoint del Apps Script. |
 | v1.3 | 2026-07-16 | `14f4959` | Mejoras de robustez y seguridad: parseo de `k` con `URLSearchParams`, validación de protocolo antes de redirigir, mensaje y botón de reintento cuando falla la redirección automática, `README.md` con documentación y esta tabla de versiones. |
+| v1.4 | 2026-07-16 | *(pendiente)* | Copia pública del repo (`qr-dinamicos`) publicada con GitHub Pages activado; nuevo Apps Script desplegado con acceso público y `AS_URL_BASE` actualizado para apuntar a él. |
+
+## Registro de pruebas
+
+| Prueba | Resultado |
+|---|---|
+| Apps Script accesible sin sesión de Google | OK — responde `HTTP 200` tras redirect 302 propio de Apps Script |
+| `k=soporte` devuelve URL de destino válida | OK — devuelve una URL `https://drive.google.com/...` |
+| `k` inexistente o ausente devuelve vacío | OK — el redirector muestra el mensaje de fallback en vez de redirigir |
+| GitHub Pages sirve `index.html` en el repo público | OK — `https://isra-up.github.io/qr-dinamicos/` responde `HTTP 200` |
+| Prueba end-to-end en navegador con `?k=soporte` | Pendiente |
+| Escaneo desde celular (cámara, lector QR, distintos navegadores) | Pendiente |
+| Cambiar destino en la hoja de cálculo y re-escanear el mismo QR | Pendiente |
