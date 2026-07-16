@@ -1,14 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="utf-8">
-  <title></title>
+  <title>QR Dinámico</title>
   <style>
       body {
         background-color: lightblue;
         text-align: center;
+        font-family: sans-serif;
       }
-      
+
+      #fallback {
+        display: none;
+        margin-top: 24px;
+      }
+
+      #fallback button {
+        color: #00478a;
+        font-weight: bold;
+      }
+
       .lds-ring {
   display: inline-block;
   position: relative;
@@ -50,27 +61,51 @@
 <body>
   <script>
     const AS_URL_BASE = "https://script.google.com/macros/s/AKfycbwgQqXJipuoebnHmM9bD_USkserifhY9TkCIW_AXr1HrXRrjdRM9yHUkdCpO7EvVvBB/exec";
-    
-    var url = document.location.href;
-    var k = url.substr(url.lastIndexOf("k=")+2);
-    
-    if(k){
-      fetch(AS_URL_BASE+'?k='+k)
-      .then(r => r.text())
-      .then((r) => {
-        console.log(r);
-        //document.write(r);
-        if(r){
-          document.location.replace(r);
-        }
-      })
-      .catch(err => console.log(err))
+    const ALLOWED_PROTOCOLS = ["http:", "https:", "mailto:", "tel:"];
+
+    function showFallback(message) {
+      document.getElementById("lds-ring").style.display = "none";
+      var fallback = document.getElementById("fallback");
+      fallback.querySelector("p").textContent = message;
+      fallback.style.display = "block";
     }
 
+    function isSafeDestination(destino) {
+      try {
+        var target = new URL(destino);
+        return ALLOWED_PROTOCOLS.includes(target.protocol);
+      } catch (err) {
+        return false;
+      }
+    }
+
+    var k = new URLSearchParams(document.location.search).get("k");
+
+    if (k) {
+      fetch(AS_URL_BASE + "?k=" + encodeURIComponent(k))
+        .then(function (r) { return r.text(); })
+        .then(function (destino) {
+          if (destino && isSafeDestination(destino)) {
+            document.location.replace(destino);
+          } else {
+            showFallback("No se pudo determinar un destino válido para este código.");
+          }
+        })
+        .catch(function (err) {
+          console.log(err);
+          showFallback("No se pudo contactar el servicio de redirección. Verifica tu conexión e inténtalo de nuevo.");
+        });
+    } else {
+      showFallback("Este enlace no incluye un código válido.");
+    }
   </script>
-  
-  <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
-  
-  
+
+  <div id="lds-ring" class="lds-ring"><div></div><div></div><div></div><div></div></div>
+
+  <div id="fallback">
+    <p></p>
+    <button onclick="location.reload()">Reintentar</button>
+  </div>
+
 </body>
 </html>
