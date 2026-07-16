@@ -54,5 +54,5 @@ Editar la fuente de datos del Apps Script (hoja de cálculo) que resuelve `k -> 
 | Prueba end-to-end en navegador con `?k=soporte` | OK |
 | Escaneo desde celular (cámara) | OK — confirmado por el usuario |
 | Verificación por software de que el QR con diseño sigue siendo decodificable | OK — decodifica exactamente a la URL esperada |
-| Escaneo del QR con diseño desde celular (distintos lectores/navegadores) | Pendiente |
+| Escaneo del QR con diseño desde celular | OK — confirmado por el usuario |
 | Cambiar destino en la hoja de cálculo y re-escanear el mismo QR | Pendiente |
