@@ -31,6 +31,32 @@ Editar la fuente de datos del Apps Script (hoja de cálculo) que resuelve `k -> 
 - No se debe guardar en este repositorio ninguna credencial, token o dato personal.
 - El redirector valida el protocolo de la URL de destino antes de redirigir (bloquea `javascript:`, `data:`, etc.), pero quien administre el Apps Script sigue siendo responsable de no configurar destinos maliciosos.
 
+## Referencia para fases futuras: análisis de QRServer-API
+
+[`mesacarlos/QRServer-API`](https://github.com/mesacarlos/QRServer-API) ("TusCódigosQR", con frontend hermano en `QRServer-web`) es un backend PHP 8 / Laravel Lumen + MySQL de un proyecto final de carrera que implementa el mismo concepto de QR dinámico, pero como aplicación multiusuario completa con panel de administración. Corresponde a lo que este proyecto llama "Fase 3/4" (backend propio + VPS).
+
+**Está abandonado** (último commit: diciembre 2021, 1 star, sin licencia declarada en el repo) — no se recomienda usarlo como dependencia, solo como referencia de diseño.
+
+Comparación con la arquitectura actual de DynQRs:
+
+| Concepto | DynQRs (este repo) | QRServer-API |
+|---|---|---|
+| Identificador del QR | `?k=soporte` (query param) | `/q/{id}` (parte de la ruta) |
+| Resolución del destino | Google Apps Script + hoja de cálculo | Tabla MySQL `qr_codes` (`id`, `user_id`, `destination_url`) |
+| Redirección | JS en el navegador (`fetch` + `location.replace`) | Servidor: redirect HTTP 302 real (`PublicController::qrRedirect`) |
+| Administración de destinos | Cuenta Google (2FA) | Sistema de usuarios propio + tokens + verificación de email |
+| Analítica | Ninguna | Tabla `qr_clicks` (fecha, IP, país, browser, OS, idioma, tipo de dispositivo), expuesta agregada en `/api/v1/qrcode/{id}/stats` |
+| Personalización del QR | `scripts/generate-qr.js` (`qr-code-styling` + `canvas`/`sharp`) | Endpoint que usa `simplesoftwareio/simple-qrcode`: color, color de fondo, estilo de punto, tamaño, logo |
+
+Aprendizajes útiles para este proyecto:
+
+- Usan corrección de errores `H` y fusionan el logo con un ratio ~0.3 del tamaño del QR — coincide con lo que ya usamos en `scripts/generate-qr.js` (`imageSize: 0.22`), confirmando que esos parámetros son razonables.
+- Su redirección es un 302 real hecho por el servidor (más rápido, funciona sin JS), a diferencia de nuestro `fetch()` desde el navegador — es la limitación inherente de resolver el destino desde el cliente en vez del servidor.
+- Si en el futuro se quisiera analítica básica sin migrar a un backend completo, se podría loguear en la misma hoja de Google Sheets (vía el Apps Script) campos similares a su tabla `qr_clicks`: fecha, IP/país, browser, OS, idioma, dispositivo.
+- Su redirect tampoco valida el destino contra ningún allowlist (mismo tipo de riesgo de open redirect que ya mitigamos aquí con la validación de protocolo).
+
+**Recomendación:** no migrar a esto en la fase actual — implicaría saltar a un VPS con PHP/MySQL y mantener un repo huérfano desde 2021. Queda documentado como referencia si más adelante se justifica construir un backend propio.
+
 ## Tabla de versiones
 
 | Versión | Fecha | Commit | Cambios |
@@ -43,6 +69,7 @@ Editar la fuente de datos del Apps Script (hoja de cálculo) que resuelve `k -> 
 | v1.5 | 2026-07-16 | `043ffd1` | Se agrega `assets/qr-soporte.png`, código QR generado para `https://isra-up.github.io/qr-dinamicos/?k=soporte`. |
 | v1.6 | 2026-07-16 | `acef41f` | Se agrega versión con diseño del QR (`qr-soporte-styled.png`/`.svg`): color azul institucional aproximado, puntos redondeados y logo institucional al centro; verificado que sigue siendo decodificable. |
 | v1.7 | 2026-07-16 | `033095c` | Se confirma por el usuario que el QR con diseño escanea correctamente desde celular; se actualiza el registro de pruebas. |
+| v1.8 | 2026-07-16 | *(pendiente)* | Se agrega sección de referencia con el análisis de `mesacarlos/QRServer-API`, comparándolo contra la arquitectura actual y documentando aprendizajes para posibles fases futuras. |
 
 ## Registro de pruebas
 
