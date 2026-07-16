@@ -1,0 +1,15 @@
+{
+  "name": "dynqrs-qr-generator",
+  "private": true,
+  "description": "Script para regenerar assets/qr-soporte-styled.png a partir de generate-qr.js",
+  "scripts": {
+    "generate": "node generate-qr.js"
+  },
+  "dependencies": {
+    "canvas": "^3.2.3",
+    "jsdom": "^29.1.1",
+    "jsqr": "^1.4.0",
+    "qr-code-styling": "^1.9.2",
+    "sharp": "^0.35.3"
+  }
+}

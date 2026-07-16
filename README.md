@@ -4,9 +4,13 @@ Sistema de código QR dinámico para soporte, alojado en GitHub Pages.
 
 Publicado en: https://isra-up.github.io/qr-dinamicos/ (copia pública del repositorio, en `github.com/Isra-up/qr-dinamicos`, para que GitHub Pages gratuito funcione).
 
-Código QR de prueba (`?k=soporte`): `assets/qr-soporte.png`.
+Código QR de prueba (`?k=soporte`), versión simple: `assets/qr-soporte.png`.
 
-![QR de soporte](assets/qr-soporte.png)
+Código QR con diseño (color institucional + logo), misma URL: `assets/qr-soporte-styled.png` (también disponible en SVG para impresión en gran formato: `assets/qr-soporte-styled.svg`).
+
+![QR de soporte con diseño](assets/qr-soporte-styled.png)
+
+**Nota de diseño:** el color usado es un azul aproximado (`#002F6C`), no un Pantone/hex oficial de la marca — si se cuenta con el manual de marca, actualizar `BLUE` en el script de generación. Las esquinas del buscador (los 3 cuadros de las puntas) deben mantenerse en estilo `square`: se probó con esquinas redondeadas/tipo "dot" junto con el logo y varios lectores de QR dejan de decodificar el código — los puntos del cuerpo sí pueden ser `rounded` sin problema. El logo usa nivel de corrección de errores `H` (máximo) para tolerar la oclusión central.
 
 ## Funcionamiento
 
@@ -37,6 +41,7 @@ Editar la fuente de datos del Apps Script (hoja de cálculo) que resuelve `k -> 
 | v1.3 | 2026-07-16 | `14f4959` | Mejoras de robustez y seguridad: parseo de `k` con `URLSearchParams`, validación de protocolo antes de redirigir, mensaje y botón de reintento cuando falla la redirección automática, `README.md` con documentación y esta tabla de versiones. |
 | v1.4 | 2026-07-16 | `9c2201f` | Copia pública del repo (`qr-dinamicos`) publicada con GitHub Pages activado; nuevo Apps Script desplegado con acceso público y `AS_URL_BASE` actualizado para apuntar a él. |
 | v1.5 | 2026-07-16 | `043ffd1` | Se agrega `assets/qr-soporte.png`, código QR generado para `https://isra-up.github.io/qr-dinamicos/?k=soporte`. |
+| v1.6 | 2026-07-16 | *(pendiente)* | Se agrega versión con diseño del QR (`qr-soporte-styled.png`/`.svg`): color azul institucional aproximado, puntos redondeados y logo institucional al centro; verificado que sigue siendo decodificable. |
 
 ## Registro de pruebas
 
@@ -46,6 +51,8 @@ Editar la fuente de datos del Apps Script (hoja de cálculo) que resuelve `k -> 
 | `k=soporte` devuelve URL de destino válida | OK — devuelve una URL `https://drive.google.com/...` |
 | `k` inexistente o ausente devuelve vacío | OK — el redirector muestra el mensaje de fallback en vez de redirigir |
 | GitHub Pages sirve `index.html` en el repo público | OK — `https://isra-up.github.io/qr-dinamicos/` responde `HTTP 200` |
-| Prueba end-to-end en navegador con `?k=soporte` | Pendiente |
-| Escaneo desde celular (cámara, lector QR, distintos navegadores) | Pendiente |
+| Prueba end-to-end en navegador con `?k=soporte` | OK |
+| Escaneo desde celular (cámara) | OK — confirmado por el usuario |
+| Verificación por software de que el QR con diseño sigue siendo decodificable | OK — decodifica exactamente a la URL esperada |
+| Escaneo del QR con diseño desde celular (distintos lectores/navegadores) | Pendiente |
 | Cambiar destino en la hoja de cálculo y re-escanear el mismo QR | Pendiente |
