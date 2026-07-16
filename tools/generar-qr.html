@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Generar QR — DynQRs</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 640px;
+      margin: 32px auto;
+      padding: 0 16px;
+      color: #1a1a1a;
+    }
+    h1 {
+      font-size: 20px;
+    }
+    label {
+      display: block;
+      margin-top: 16px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+    input[type="text"], input[type="url"] {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 8px;
+      font-size: 14px;
+      margin-top: 4px;
+    }
+    .row {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+    .row > div {
+      flex: 1;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 16px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    #preview {
+      margin-top: 24px;
+      text-align: center;
+    }
+    #preview canvas {
+      max-width: 100%;
+      border: 1px solid #ddd;
+    }
+    #status {
+      margin-top: 12px;
+      font-weight: bold;
+    }
+    #status.ok { color: #087443; }
+    #status.fail { color: #b3261e; }
+    #downloads {
+      margin-top: 12px;
+      display: none;
+      gap: 8px;
+    }
+    #downloads a {
+      padding: 8px 12px;
+      border: 1px solid #002F6C;
+      color: #002F6C;
+      text-decoration: none;
+      border-radius: 4px;
+    }
+    .nota {
+      font-size: 12px;
+      color: #666;
+      margin-top: 24px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Generar código QR — DynQRs</h1>
+  <p>Genera un QR con diseño (color + logo) para un nuevo <code>k</code>, corriendo todo en el navegador. Recuerda dar de alta ese mismo <code>k</code> en la hoja de cálculo del Apps Script antes de usar el QR.</p>
+
+  <label for="baseUrl">URL base (GitHub Pages)</label>
+  <input type="url" id="baseUrl" value="https://isra-up.github.io/qr-dinamicos/">
+
+  <label for="k">Código (k)</label>
+  <input type="text" id="k" placeholder="soporte" value="soporte">
+
+  <div class="row">
+    <div>
+      <label for="color">Color</label>
+      <input type="text" id="color" value="#002F6C">
+    </div>
+    <div>
+      <label for="logoFile">Logo (opcional, reemplaza el default)</label>
+      <input type="file" id="logoFile" accept="image/*">
+    </div>
+  </div>
+
+  <button id="generar">Generar QR</button>
+
+  <div id="preview"></div>
+  <div id="status"></div>
+  <div id="downloads">
+    <a id="downloadPng" download="qr.png">Descargar PNG</a>
+    <a id="downloadSvg" download="qr.svg">Descargar SVG</a>
+  </div>
+
+  <p class="nota">
+    Nota: las esquinas del buscador (los 3 cuadros de las puntas) se mantienen fijas en estilo cuadrado a propósito —
+    se probó que combinarlas con estilos redondeados junto con un logo hace que varios lectores de QR dejen de
+    decodificar el código. Cada QR generado aquí se verifica automáticamente con un decodificador (jsQR) antes de
+    habilitar la descarga.
+  </p>
+
+  <script src="vendor/qr-code-styling.js"></script>
+  <script src="vendor/jsQR.js"></script>
+  <script>
+    const DEFAULT_LOGO = "../assets/logo-up.jpg";
+    let logoOverrideDataUri = null;
+
+    document.getElementById("logoFile").addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) {
+        logoOverrideDataUri = null;
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => { logoOverrideDataUri = reader.result; };
+      reader.readAsDataURL(file);
+    });
+
+    function setStatus(ok, message) {
+      const el = document.getElementById("status");
+      el.textContent = message;
+      el.className = ok ? "ok" : "fail";
+    }
+
+    async function generar() {
+      const baseUrl = document.getElementById("baseUrl").value.trim().replace(/\/?$/, "/");
+      const k = document.getElementById("k").value.trim();
+      const color = document.getElementById("color").value.trim() || "#002F6C";
+
+      if (!k) {
+        setStatus(false, "Ingresa un código (k).");
+        return;
+      }
+
+      const targetUrl = baseUrl + "?k=" + encodeURIComponent(k);
+      const image = logoOverrideDataUri || DEFAULT_LOGO;
+
+      const preview = document.getElementById("preview");
+      preview.innerHTML = "";
+      document.getElementById("downloads").style.display = "none";
+      setStatus(true, "Generando…");
+
+      const qrCode = new QRCodeStyling({
+        width: 800,
+        height: 800,
+        type: "canvas",
+        data: targetUrl,
+        image: image,
+        margin: 16,
+        qrOptions: {
+          errorCorrectionLevel: "H",
+        },
+        imageOptions: {
+          imageSize: 0.22,
+          margin: 6,
+          hideBackgroundDots: true,
+        },
+        dotsOptions: {
+          color: color,
+          type: "rounded",
+        },
+        cornersSquareOptions: {
+          color: color,
+          type: "square",
+        },
+        cornersDotOptions: {
+          color: color,
+          type: "square",
+        },
+        backgroundOptions: {
+          color: "#ffffff",
+        },
+      });
+
+      qrCode.append(preview);
+
+      // Esperar a que el canvas termine de dibujarse (incluye carga del logo).
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
+      const canvas = preview.querySelector("canvas");
+      if (!canvas) {
+        setStatus(false, "No se pudo generar el QR.");
+        return;
+      }
+
+      const ctx = canvas.getContext("2d");
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const decoded = jsQR(imageData.data, canvas.width, canvas.height);
+
+      if (!decoded) {
+        setStatus(false, "⚠️ Verificación falló: el QR generado no se pudo decodificar. No lo uses.");
+        return;
+      }
+      if (decoded.data !== targetUrl) {
+        setStatus(false, "⚠️ Verificación falló: el QR decodifica a algo distinto de lo esperado.");
+        return;
+      }
+
+      setStatus(true, "✅ Verificado: decodifica correctamente a " + decoded.data);
+
+      const pngUrl = canvas.toDataURL("image/png");
+      document.getElementById("downloadPng").href = pngUrl;
+      document.getElementById("downloadPng").download = "qr-" + k + ".png";
+
+      const svgData = await qrCode.getRawData("svg");
+      const svgUrl = URL.createObjectURL(new Blob([svgData], { type: "image/svg+xml" }));
+      document.getElementById("downloadSvg").href = svgUrl;
+      document.getElementById("downloadSvg").download = "qr-" + k + ".svg";
+
+      document.getElementById("downloads").style.display = "flex";
+    }
+
+    document.getElementById("generar").addEventListener("click", generar);
+  </script>
+</body>
+</html>

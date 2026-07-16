@@ -12,6 +12,10 @@ Código QR con diseño (color institucional + logo), misma URL: `assets/qr-sopor
 
 **Nota de diseño:** el color usado es un azul aproximado (`#002F6C`), no un Pantone/hex oficial de la marca — si se cuenta con el manual de marca, actualizar `BLUE` en el script de generación. Las esquinas del buscador (los 3 cuadros de las puntas) deben mantenerse en estilo `square`: se probó con esquinas redondeadas/tipo "dot" junto con el logo y varios lectores de QR dejan de decodificar el código — los puntos del cuerpo sí pueden ser `rounded` sin problema. El logo usa nivel de corrección de errores `H` (máximo) para tolerar la oclusión central.
 
+## Generar nuevos QR sin instalar nada
+
+`tools/generar-qr.html` es una página que corre 100% en el navegador (sin Node, sin instalar dependencias) para generar un QR con diseño para cualquier `k` nuevo. Basta con abrirla localmente o vía GitHub Pages (`https://isra-up.github.io/qr-dinamicos/tools/generar-qr.html`), escribir el código y el color, y descargar el PNG/SVG. Usa las mismas librerías vendorizadas en `tools/vendor/` (`qr-code-styling.js`, `jsQR.js`) y aplica las mismas restricciones de diseño seguras (esquinas cuadradas, corrección `H`); cada QR generado se verifica automáticamente con `jsQR` antes de habilitar la descarga. Recuerda dar de alta el `k` correspondiente en la hoja de cálculo del Apps Script antes de usar el QR generado.
+
 ## Funcionamiento
 
 1. El código QR apunta siempre a la misma URL de GitHub Pages, con un parámetro `k` que identifica el destino (por ejemplo `https://isra-up.github.io/qr-dinamicos/?k=soporte`).
@@ -70,6 +74,7 @@ Aprendizajes útiles para este proyecto:
 | v1.6 | 2026-07-16 | `acef41f` | Se agrega versión con diseño del QR (`qr-soporte-styled.png`/`.svg`): color azul institucional aproximado, puntos redondeados y logo institucional al centro; verificado que sigue siendo decodificable. |
 | v1.7 | 2026-07-16 | `033095c` | Se confirma por el usuario que el QR con diseño escanea correctamente desde celular; se actualiza el registro de pruebas. |
 | v1.8 | 2026-07-16 | `2e873d5` | Se agrega sección de referencia con el análisis de `mesacarlos/QRServer-API`, comparándolo contra la arquitectura actual y documentando aprendizajes para posibles fases futuras. |
+| v1.9 | 2026-07-16 | *(pendiente)* | Se agrega `tools/generar-qr.html`: generador de QR con diseño 100% en el navegador (sin Node), usando `qr-code-styling` y `jsQR` vendorizados; verificado con Playwright/Chromium real. |
 
 ## Registro de pruebas
 
@@ -84,3 +89,5 @@ Aprendizajes útiles para este proyecto:
 | Verificación por software de que el QR con diseño sigue siendo decodificable | OK — decodifica exactamente a la URL esperada |
 | Escaneo del QR con diseño desde celular | OK — confirmado por el usuario |
 | Cambiar destino en la hoja de cálculo y re-escanear el mismo QR | Pendiente |
+| `tools/generar-qr.html`: genera y verifica un QR nuevo en Chromium real (Playwright) | OK — decodifica exactamente a la URL esperada, para `k=soporte` y `k=fixpc` |
+| `tools/generar-qr.html`: validación al dejar `k` vacío | OK — muestra "Ingresa un código (k)." sin intentar generar |
