@@ -4,6 +4,10 @@ Sistema de código QR dinámico para soporte, alojado en GitHub Pages.
 
 Publicado en: https://isra-up.github.io/qr-dinamicos/ (copia pública del repositorio, en `github.com/Isra-up/qr-dinamicos`, para que GitHub Pages gratuito funcione).
 
+Código QR de prueba (`?k=soporte`): `assets/qr-soporte.png`.
+
+![QR de soporte](assets/qr-soporte.png)
+
 ## Funcionamiento
 
 1. El código QR apunta siempre a la misma URL de GitHub Pages, con un parámetro `k` que identifica el destino (por ejemplo `https://isra-up.github.io/qr-dinamicos/?k=soporte`).
@@ -32,6 +36,7 @@ Editar la fuente de datos del Apps Script (hoja de cálculo) que resuelve `k -> 
 | v1.2 | 2025-01-18 | `fd30afe` | Actualización del endpoint del Apps Script. |
 | v1.3 | 2026-07-16 | `14f4959` | Mejoras de robustez y seguridad: parseo de `k` con `URLSearchParams`, validación de protocolo antes de redirigir, mensaje y botón de reintento cuando falla la redirección automática, `README.md` con documentación y esta tabla de versiones. |
 | v1.4 | 2026-07-16 | `9c2201f` | Copia pública del repo (`qr-dinamicos`) publicada con GitHub Pages activado; nuevo Apps Script desplegado con acceso público y `AS_URL_BASE` actualizado para apuntar a él. |
+| v1.5 | 2026-07-16 | *(pendiente)* | Se agrega `assets/qr-soporte.png`, código QR generado para `https://isra-up.github.io/qr-dinamicos/?k=soporte`. |
 
 ## Registro de pruebas
 
