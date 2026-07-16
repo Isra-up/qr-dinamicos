@@ -23,9 +23,9 @@ Editar la fuente de datos del Apps Script (hoja de cálculo) que resuelve `k -> 
 
 ## Tabla de versiones
 
-| Versión | Fecha | Cambios |
-|---|---|---|
-| v1.0 | 2022-01-19 | Versión inicial: redirección estática vía JavaScript. |
-| v1.1 | 2022-01-19 | Se agrega integración con Google Apps Script (`AS_URL_BASE`) y parámetro `k`. |
-| v1.2 | 2025-01-18 | Actualización del endpoint del Apps Script. |
-| v1.3 | 2026-07-16 | Mejoras de robustez y seguridad: parseo de `k` con `URLSearchParams`, validación de protocolo antes de redirigir, mensaje y botón de reintento cuando falla la redirección automática, `README.md` con documentación y esta tabla de versiones. |
+| Versión | Fecha | Commit | Cambios |
+|---|---|---|---|
+| v1.0 | 2022-01-19 | `8d00f98` | Versión inicial: redirección estática vía JavaScript. |
+| v1.1 | 2022-01-19 | `fe37ff8` | Se agrega integración con Google Apps Script (`AS_URL_BASE`) y parámetro `k`. |
+| v1.2 | 2025-01-18 | `fd30afe` | Actualización del endpoint del Apps Script. |
+| v1.3 | 2026-07-16 | `14f4959` | Mejoras de robustez y seguridad: parseo de `k` con `URLSearchParams`, validación de protocolo antes de redirigir, mensaje y botón de reintento cuando falla la redirección automática, `README.md` con documentación y esta tabla de versiones. |
