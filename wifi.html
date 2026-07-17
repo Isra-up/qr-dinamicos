@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WiFi de visitantes</title>
+  <style>
+    body {
+      background-color: lightblue;
+      text-align: center;
+      font-family: sans-serif;
+      margin: 0;
+      padding: 24px 16px;
+    }
+    h1 {
+      font-size: 22px;
+      color: #00478a;
+    }
+    #card {
+      display: none;
+      background: #fff;
+      border-radius: 12px;
+      max-width: 360px;
+      margin: 16px auto;
+      padding: 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    .campo {
+      margin-top: 16px;
+      text-align: left;
+    }
+    .campo label {
+      display: block;
+      font-size: 13px;
+      color: #555;
+      font-weight: bold;
+    }
+    .valor {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .valor span {
+      font-size: 20px;
+      font-weight: bold;
+      word-break: break-all;
+    }
+    .valor button {
+      border: 1px solid #00478a;
+      color: #00478a;
+      background: #fff;
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 12px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    #qrWrap {
+      margin-top: 20px;
+    }
+    #qrWrap canvas {
+      max-width: 100%;
+      border: 1px solid #ddd;
+    }
+    .nota {
+      font-size: 12px;
+      color: #666;
+      margin-top: 12px;
+    }
+    #fallback {
+      display: none;
+      margin-top: 24px;
+    }
+    #fallback button {
+      color: #00478a;
+      font-weight: bold;
+    }
+    .lds-ring {
+      display: inline-block;
+      position: relative;
+      width: 80px;
+      height: 80px;
+    }
+    .lds-ring div {
+      box-sizing: border-box;
+      display: block;
+      position: absolute;
+      width: 64px;
+      height: 64px;
+      margin: 8px;
+      border: 8px solid #fff;
+      border-radius: 50%;
+      animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+      border-color: #fff transparent transparent transparent;
+    }
+    .lds-ring div:nth-child(1) { animation-delay: -0.45s; }
+    .lds-ring div:nth-child(2) { animation-delay: -0.3s; }
+    .lds-ring div:nth-child(3) { animation-delay: -0.15s; }
+    @keyframes lds-ring {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <h1>WiFi de visitantes</h1>
+
+  <div id="lds-ring" class="lds-ring"><div></div><div></div><div></div><div></div></div>
+
+  <div id="card">
+    <div class="campo">
+      <label>Red</label>
+      <div class="valor"><span id="ssidText"></span></div>
+    </div>
+    <div class="campo">
+      <label>Contraseña</label>
+      <div class="valor">
+        <span id="passText"></span>
+        <button id="copyBtn" type="button">Copiar</button>
+      </div>
+    </div>
+    <div id="qrWrap"></div>
+    <p class="nota" id="qrNota">Escanea este código con la cámara para conectarte automáticamente.</p>
+  </div>
+
+  <div id="fallback">
+    <p></p>
+    <button onclick="location.reload()">Reintentar</button>
+  </div>
+
+  <script src="tools/vendor/qr-code-styling.js"></script>
+  <script src="tools/vendor/jsQR.js"></script>
+  <script>
+    const AS_URL_BASE = "https://script.google.com/macros/s/AKfycbw5PnDQ94auILxGnAFaY2kZk3b9bUAaMS7BzxEncoBZQyQyxh0xOLlRyHMxTSF3hEMc/exec";
+
+    function showFallback(message) {
+      document.getElementById("lds-ring").style.display = "none";
+      const fallback = document.getElementById("fallback");
+      fallback.querySelector("p").textContent = message;
+      fallback.style.display = "block";
+    }
+
+    function escapeWifiField(value) {
+      return String(value).replace(/([\\;,":])/g, "\\$1");
+    }
+
+    function buildWifiPayload(security, ssid, password, hidden) {
+      let payload = "WIFI:T:" + security + ";S:" + escapeWifiField(ssid) + ";";
+      if (security !== "nopass" && password) {
+        payload += "P:" + escapeWifiField(password) + ";";
+      }
+      if (hidden === "true") {
+        payload += "H:true;";
+      }
+      payload += ";";
+      return payload;
+    }
+
+    function parseWifiRow(destino) {
+      // Formato esperado en la hoja: WIFI|<T:WPA|WEP|nopass>|<ssid>|<password>|<oculta:true|false>
+      const partes = destino.split("|");
+      if (partes.length < 3 || partes[0] !== "WIFI") return null;
+      const [, security, ssid, password = "", hidden = "false"] = partes;
+      if (!["WPA", "WEP", "nopass"].includes(security) || !ssid) return null;
+      return { security, ssid, password, hidden };
+    }
+
+    async function mostrarWifi(datos) {
+      document.getElementById("ssidText").textContent = datos.ssid;
+      document.getElementById("passText").textContent =
+        datos.security === "nopass" ? "(red abierta, sin contraseña)" : datos.password;
+
+      const payload = buildWifiPayload(datos.security, datos.ssid, datos.password, datos.hidden);
+
+      const qrCode = new QRCodeStyling({
+        width: 500,
+        height: 500,
+        type: "canvas",
+        data: payload,
+        margin: 16,
+        qrOptions: { errorCorrectionLevel: "H" },
+        dotsOptions: { color: "#002F6C", type: "rounded" },
+        cornersSquareOptions: { color: "#002F6C", type: "square" },
+        cornersDotOptions: { color: "#002F6C", type: "square" },
+        backgroundOptions: { color: "#ffffff" },
+      });
+
+      const qrWrap = document.getElementById("qrWrap");
+      qrWrap.innerHTML = "";
+      qrCode.append(qrWrap);
+      await qrCode.getRawData("png");
+
+      const canvas = qrWrap.querySelector("canvas");
+      const ctx = canvas.getContext("2d");
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const decoded = jsQR(imageData.data, canvas.width, canvas.height);
+
+      if (!decoded || decoded.data !== payload) {
+        qrWrap.innerHTML = "";
+        document.getElementById("qrNota").textContent =
+          "No se pudo generar el código para conexión automática; usa la red y contraseña de arriba manualmente.";
+      }
+
+      document.getElementById("lds-ring").style.display = "none";
+      document.getElementById("card").style.display = "block";
+    }
+
+    document.getElementById("copyBtn").addEventListener("click", () => {
+      const texto = document.getElementById("passText").textContent;
+      navigator.clipboard.writeText(texto).then(() => {
+        const btn = document.getElementById("copyBtn");
+        const original = btn.textContent;
+        btn.textContent = "¡Copiado!";
+        setTimeout(() => { btn.textContent = original; }, 1500);
+      });
+    });
+
+    const k = new URLSearchParams(document.location.search).get("k");
+
+    if (k) {
+      fetch(AS_URL_BASE + "?k=" + encodeURIComponent(k))
+        .then((r) => r.text())
+        .then((destino) => {
+          const datos = destino ? parseWifiRow(destino) : null;
+          if (datos) {
+            mostrarWifi(datos);
+          } else {
+            showFallback("No se encontraron datos de WiFi válidos para este código.");
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          showFallback("No se pudo contactar el servicio. Verifica tu conexión e inténtalo de nuevo.");
+        });
+    } else {
+      showFallback("Este enlace no incluye un código válido.");
+    }
+  </script>
+</body>
+</html>

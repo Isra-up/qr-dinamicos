@@ -29,6 +29,19 @@ El destino real (a dónde apunta cada `k`) se administra en el Google Apps Scrip
 
 Editar la fuente de datos del Apps Script (hoja de cálculo) que resuelve `k -> URL`. No requiere cambios en este repositorio salvo que cambie el endpoint del Apps Script.
 
+## QR de WiFi con contraseña que cambia (ej. red de visitantes)
+
+Un QR de WiFi normal (formato `WIFI:T:WPA;S:...;P:...;;`) trae la contraseña incrustada en la imagen, así que cambiarla obliga a reimprimir. Para evitarlo, `wifi.html` reutiliza el mismo mecanismo `k -> valor` de la hoja de cálculo, pero interpretando el valor como datos de WiFi en vez de una URL de redirección (no requiere cambios en el Apps Script).
+
+**Configuración (una sola vez):**
+
+1. En la hoja `Destinos`, agrega una fila con el `k` que quieras (ej. `wifi-visitantes`) y como valor el formato: `WIFI|<T>|<ssid>|<password>|<oculta>`, donde `T` es `WPA`, `WEP` o `nopass`, y `<oculta>` es `true`/`false`. Ejemplo: `WIFI|WPA|RedVisitantes|ClaveDeEstaSemana|false`. (El SSID y la contraseña no pueden contener el carácter `|`.)
+2. Genera el QR **impreso, fijo**, con `tools/generar-qr.html`: en "URL base" escribe `https://isra-up.github.io/qr-dinamicos/wifi.html` y en "Código (k)" el mismo `k` de la fila (ej. `wifi-visitantes`). Este QR ya no cambia nunca.
+
+**Cada semana:** solo edita la contraseña en esa misma fila de la hoja de cálculo. El QR impreso sigue funcionando sin reimprimir.
+
+**Qué ve el visitante al escanear:** `wifi.html` consulta el mismo Apps Script, muestra el nombre de la red y la contraseña como texto (con botón de copiar), y genera al vuelo un segundo QR en pantalla, ese sí en formato nativo `WIFI:...`, para que puedan conectarse con un toque en vez de teclear la contraseña. Ese segundo QR se verifica con `jsQR` antes de mostrarse; si algo falla, se oculta y queda solo el texto como respaldo.
+
 ## Seguridad
 
 - La cuenta que administra el Apps Script/hoja de cálculo debe tener 2FA activado.
@@ -78,6 +91,7 @@ Aprendizajes útiles para este proyecto:
 | v1.10 | 2026-07-16 | `c25ebc5` | Corrección de una carrera en `tools/generar-qr.html`: el timeout fijo de 300ms fallaba en producción (red real) porque la carga del logo tardaba más; se cambia a esperar la promesa real de dibujo. Verificado en `https://isra-up.github.io/qr-dinamicos/tools/generar-qr.html`. |
 | v1.11 | 2026-07-17 | `df4fb51` | Corrección de un cuelgue en `tools/generar-qr.html`: si el logo elegido por el usuario no es una imagen válida (archivo dañado o formato no soportado), la librería vendorizada nunca resolvía la promesa de dibujo (no maneja `onerror`) y la UI se quedaba en "Generando…" para siempre. Se agrega una validación previa con `Image().onload/onerror` que detecta el fallo y muestra un mensaje claro. Verificado en producción con Playwright, reproduciendo el cuelgue original y confirmando el fix. |
 | v1.12 | 2026-07-17 | `dd9d155` | Se confirma por el usuario que, tras cambiar el destino de `soporte` en la hoja de cálculo, el mismo QR ya impreso redirige correctamente al nuevo destino sin necesidad de regenerar la imagen; se actualiza el registro de pruebas (era la única prueba pendiente). |
+| v1.13 | 2026-07-17 | (pendiente) | Se agrega `wifi.html`: QR fijo para WiFi de visitantes cuya contraseña cambia semanalmente sin reimprimir, reutilizando el mismo mecanismo `k -> valor` de la hoja de cálculo (sin cambios en el Apps Script). Muestra la red/contraseña como texto y genera al vuelo un segundo QR en formato nativo `WIFI:...`, verificado con `jsQR`. Se corrige además un bug en `tools/generar-qr.html`: la "URL base" siempre forzaba una barra final, rompiendo URLs que terminan en un archivo (como `wifi.html`). |
 
 ## Registro de pruebas
 
@@ -96,3 +110,8 @@ Aprendizajes útiles para este proyecto:
 | `tools/generar-qr.html`: validación al dejar `k` vacío | OK — muestra "Ingresa un código (k)." sin intentar generar |
 | `tools/generar-qr.html` en producción real (`isra-up.github.io/qr-dinamicos`), con Playwright | OK — falló con timeout fijo (300ms), se corrigió y se re-verificó OK |
 | `tools/generar-qr.html`: logo con archivo inválido (no decodifica como imagen) | OK — antes se colgaba en "Generando…" indefinidamente; se corrigió y ahora muestra "⚠️ El logo no es una imagen válida…"; verificado en local y en producción |
+| `wifi.html`: red WPA con caracteres especiales (`;`, `"`) en SSID/contraseña | OK (con respuesta simulada del Apps Script vía Playwright) — se muestran correctamente como texto y el QR `WIFI:...` generado decodifica exactamente al valor esperado tras escapar los caracteres |
+| `wifi.html`: red abierta (`nopass`) | OK (con respuesta simulada) — se muestra "(red abierta, sin contraseña)" y no se incluye campo `P:` en el QR |
+| `wifi.html`: `k` sin fila válida en la hoja | OK (con respuesta simulada) — muestra el mensaje de fallback en vez de quedarse cargando |
+| `tools/generar-qr.html`: "URL base" que termina en un archivo (ej. `wifi.html`) en vez de un directorio | OK — antes generaba `wifi.html/?k=...` (ruta rota); se corrigió y ahora genera `wifi.html?k=...`; no rompe el caso original con URL base tipo directorio |
+| `wifi.html` con datos reales de la hoja de cálculo (fila `WIFI\|...` real) y escaneo desde celular | Pendiente — falta que el usuario dé de alta la fila y pruebe con un teléfono real |

@@ -143,8 +143,19 @@
       });
     }
 
+    function buildTargetUrl(baseUrlRaw, k) {
+      let baseUrl = baseUrlRaw.trim();
+      const ultimoSegmento = baseUrl.split("/").pop().split("?")[0];
+      const pareceArchivo = ultimoSegmento.includes(".");
+      if (!pareceArchivo && !baseUrl.includes("?")) {
+        baseUrl = baseUrl.replace(/\/?$/, "/");
+      }
+      const separador = baseUrl.includes("?") ? "&" : "?";
+      return baseUrl + separador + "k=" + encodeURIComponent(k);
+    }
+
     async function generar() {
-      const baseUrl = document.getElementById("baseUrl").value.trim().replace(/\/?$/, "/");
+      const baseUrl = document.getElementById("baseUrl").value;
       const k = document.getElementById("k").value.trim();
       const color = document.getElementById("color").value.trim() || "#002F6C";
 
@@ -153,7 +164,7 @@
         return;
       }
 
-      const targetUrl = baseUrl + "?k=" + encodeURIComponent(k);
+      const targetUrl = buildTargetUrl(baseUrl, k);
       const image = logoOverrideDataUri || DEFAULT_LOGO;
 
       setStatus(true, "Validando logo…");
