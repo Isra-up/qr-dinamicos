@@ -93,6 +93,7 @@ Aprendizajes útiles para este proyecto:
 | v1.12 | 2026-07-17 | `dd9d155` | Se confirma por el usuario que, tras cambiar el destino de `soporte` en la hoja de cálculo, el mismo QR ya impreso redirige correctamente al nuevo destino sin necesidad de regenerar la imagen; se actualiza el registro de pruebas (era la única prueba pendiente). |
 | v1.13 | 2026-07-17 | `a86c701` | Se agrega `wifi.html`: QR fijo para WiFi de visitantes cuya contraseña cambia semanalmente sin reimprimir, reutilizando el mismo mecanismo `k -> valor` de la hoja de cálculo (sin cambios en el Apps Script). Muestra la red/contraseña como texto y genera al vuelo un segundo QR en formato nativo `WIFI:...`, verificado con `jsQR`. Se corrige además un bug en `tools/generar-qr.html`: la "URL base" siempre forzaba una barra final, rompiendo URLs que terminan en un archivo (como `wifi.html`). |
 | v1.14 | 2026-07-17 | `a030821` | Se aclara en el README que los `< >` en la notación del formato `WIFI\|...` son solo placeholders, no caracteres literales a escribir en la hoja de cálculo. |
+| v1.15 | 2026-07-17 | (pendiente) | Se confirma por el usuario que `wifi.html` funciona con datos reales de la hoja de cálculo (fila `WIFI\|...` dada de alta) y con el QR impreso escaneado en un teléfono real; se actualiza el registro de pruebas. |
 
 ## Registro de pruebas
 
@@ -115,4 +116,4 @@ Aprendizajes útiles para este proyecto:
 | `wifi.html`: red abierta (`nopass`) | OK (con respuesta simulada) — se muestra "(red abierta, sin contraseña)" y no se incluye campo `P:` en el QR |
 | `wifi.html`: `k` sin fila válida en la hoja | OK (con respuesta simulada) — muestra el mensaje de fallback en vez de quedarse cargando |
 | `tools/generar-qr.html`: "URL base" que termina en un archivo (ej. `wifi.html`) en vez de un directorio | OK — antes generaba `wifi.html/?k=...` (ruta rota); se corrigió y ahora genera `wifi.html?k=...`; no rompe el caso original con URL base tipo directorio |
-| `wifi.html` con datos reales de la hoja de cálculo (fila `WIFI\|...` real) y escaneo desde celular | Pendiente — falta que el usuario dé de alta la fila y pruebe con un teléfono real |
+| `wifi.html` con datos reales de la hoja de cálculo (fila `WIFI\|...` real) y escaneo desde celular | OK — confirmado por el usuario con la fila real dada de alta en la hoja |
