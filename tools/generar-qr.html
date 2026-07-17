@@ -134,6 +134,15 @@
       el.className = ok ? "ok" : "fail";
     }
 
+    function loadImage(src) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = () => reject(new Error("No se pudo cargar la imagen"));
+        img.src = src;
+      });
+    }
+
     async function generar() {
       const baseUrl = document.getElementById("baseUrl").value.trim().replace(/\/?$/, "/");
       const k = document.getElementById("k").value.trim();
@@ -146,6 +155,14 @@
 
       const targetUrl = baseUrl + "?k=" + encodeURIComponent(k);
       const image = logoOverrideDataUri || DEFAULT_LOGO;
+
+      setStatus(true, "Validando logo…");
+      try {
+        await loadImage(image);
+      } catch (e) {
+        setStatus(false, "⚠️ El logo no es una imagen válida (archivo dañado o formato no soportado). Elige otro archivo.");
+        return;
+      }
 
       const preview = document.getElementById("preview");
       preview.innerHTML = "";
