@@ -76,6 +76,7 @@ Aprendizajes útiles para este proyecto:
 | v1.8 | 2026-07-16 | `2e873d5` | Se agrega sección de referencia con el análisis de `mesacarlos/QRServer-API`, comparándolo contra la arquitectura actual y documentando aprendizajes para posibles fases futuras. |
 | v1.9 | 2026-07-16 | `69e9967` | Se agrega `tools/generar-qr.html`: generador de QR con diseño 100% en el navegador (sin Node), usando `qr-code-styling` y `jsQR` vendorizados; verificado con Playwright/Chromium real. |
 | v1.10 | 2026-07-16 | `c25ebc5` | Corrección de una carrera en `tools/generar-qr.html`: el timeout fijo de 300ms fallaba en producción (red real) porque la carga del logo tardaba más; se cambia a esperar la promesa real de dibujo. Verificado en `https://isra-up.github.io/qr-dinamicos/tools/generar-qr.html`. |
+| v1.11 | 2026-07-17 | `df4fb51` | Corrección de un cuelgue en `tools/generar-qr.html`: si el logo elegido por el usuario no es una imagen válida (archivo dañado o formato no soportado), la librería vendorizada nunca resolvía la promesa de dibujo (no maneja `onerror`) y la UI se quedaba en "Generando…" para siempre. Se agrega una validación previa con `Image().onload/onerror` que detecta el fallo y muestra un mensaje claro. Verificado en producción con Playwright, reproduciendo el cuelgue original y confirmando el fix. |
 
 ## Registro de pruebas
 
@@ -93,3 +94,4 @@ Aprendizajes útiles para este proyecto:
 | `tools/generar-qr.html`: genera y verifica un QR nuevo en Chromium real (Playwright) | OK — decodifica exactamente a la URL esperada, para `k=soporte` y `k=fixpc` |
 | `tools/generar-qr.html`: validación al dejar `k` vacío | OK — muestra "Ingresa un código (k)." sin intentar generar |
 | `tools/generar-qr.html` en producción real (`isra-up.github.io/qr-dinamicos`), con Playwright | OK — falló con timeout fijo (300ms), se corrigió y se re-verificó OK |
+| `tools/generar-qr.html`: logo con archivo inválido (no decodifica como imagen) | OK — antes se colgaba en "Generando…" indefinidamente; se corrigió y ahora muestra "⚠️ El logo no es una imagen válida…"; verificado en local y en producción |
