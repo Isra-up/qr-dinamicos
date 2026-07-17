@@ -35,7 +35,7 @@ Un QR de WiFi normal (formato `WIFI:T:WPA;S:...;P:...;;`) trae la contraseña in
 
 **Configuración (una sola vez):**
 
-1. En la hoja `Destinos`, agrega una fila con el `k` que quieras (ej. `wifi-visitantes`) y como valor el formato: `WIFI|<T>|<ssid>|<password>|<oculta>`, donde `T` es `WPA`, `WEP` o `nopass`, y `<oculta>` es `true`/`false`. Ejemplo: `WIFI|WPA|RedVisitantes|ClaveDeEstaSemana|false`. (El SSID y la contraseña no pueden contener el carácter `|`.)
+1. En la hoja `Destinos`, agrega una fila con el `k` que quieras (ej. `wifi-visitantes`) y como valor 5 partes separadas por `|`: `WIFI`, el tipo de seguridad (`WPA`, `WEP` o `nopass`), el nombre real de tu red, la contraseña real, y si está oculta (`true`/`false`). Ejemplo real (sustituye `RedVisitantes` y `ClaveDeEstaSemana` por los tuyos, sin agregar símbolos `< >`): `WIFI|WPA|RedVisitantes|ClaveDeEstaSemana|false`. (El SSID y la contraseña no pueden contener el carácter `|`.)
 2. Genera el QR **impreso, fijo**, con `tools/generar-qr.html`: en "URL base" escribe `https://isra-up.github.io/qr-dinamicos/wifi.html` y en "Código (k)" el mismo `k` de la fila (ej. `wifi-visitantes`). Este QR ya no cambia nunca.
 
 **Cada semana:** solo edita la contraseña en esa misma fila de la hoja de cálculo. El QR impreso sigue funcionando sin reimprimir.
