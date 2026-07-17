@@ -93,7 +93,7 @@ Aprendizajes útiles para este proyecto:
 | v1.12 | 2026-07-17 | `dd9d155` | Se confirma por el usuario que, tras cambiar el destino de `soporte` en la hoja de cálculo, el mismo QR ya impreso redirige correctamente al nuevo destino sin necesidad de regenerar la imagen; se actualiza el registro de pruebas (era la única prueba pendiente). |
 | v1.13 | 2026-07-17 | `a86c701` | Se agrega `wifi.html`: QR fijo para WiFi de visitantes cuya contraseña cambia semanalmente sin reimprimir, reutilizando el mismo mecanismo `k -> valor` de la hoja de cálculo (sin cambios en el Apps Script). Muestra la red/contraseña como texto y genera al vuelo un segundo QR en formato nativo `WIFI:...`, verificado con `jsQR`. Se corrige además un bug en `tools/generar-qr.html`: la "URL base" siempre forzaba una barra final, rompiendo URLs que terminan en un archivo (como `wifi.html`). |
 | v1.14 | 2026-07-17 | `a030821` | Se aclara en el README que los `< >` en la notación del formato `WIFI\|...` son solo placeholders, no caracteres literales a escribir en la hoja de cálculo. |
-| v1.15 | 2026-07-17 | (pendiente) | Se confirma por el usuario que `wifi.html` funciona con datos reales de la hoja de cálculo (fila `WIFI\|...` dada de alta) y con el QR impreso escaneado en un teléfono real; se actualiza el registro de pruebas. |
+| v1.15 | 2026-07-17 | `5063ddf` | Se confirma por el usuario que `wifi.html` funciona con datos reales de la hoja de cálculo (fila `WIFI\|...` dada de alta) y con el QR impreso escaneado en un teléfono real; se actualiza el registro de pruebas. |
 
 ## Registro de pruebas
 
